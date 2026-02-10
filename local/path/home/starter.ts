@@ -4,7 +4,7 @@ import * as utils from "utils/utils.ts"
 
 export async function main(ns: NS) {
     ns.ui.openTail();
-    ns.ui.resizeTail(800, 600);
+    ns.ui.resizeTail(1400, 600);
     ns.disableLog('ALL');
     ns.clearLog();
     let target = "";
@@ -91,9 +91,13 @@ async function hackServer(ns: NS, target: string) {
 
             const hackThreads = Math.max(Math.floor(ns.hackAnalyzeThreads(target, steal)), 1);
             const hackPercent = ns.hackAnalyze(target) * hackThreads; // the actual percent of money we will steal based on the number of hack threads
-            const growThreads = Math.ceil(Math.max(Math.ceil(ns.growthAnalyze(target, ns.getServerMaxMoney(target) / (ns.getServerMaxMoney(target) - ns.getServerMaxMoney(target) * hackPercent))), 1)*1.1);
-            const weakThreads1 = Math.max(Math.ceil(ns.hackAnalyzeSecurity(hackThreads, target)), 1);
-            const weakThreads2 = Math.max(Math.ceil(ns.growthAnalyzeSecurity(growThreads, target)), 1);
+            const growThreads = Math.ceil(ns.growthAnalyze(target, ns.getServerMaxMoney(target) / (ns.getServerMaxMoney(target) - ns.getServerMaxMoney(target) * hackPercent))*1.1);
+            
+            const hackSecInc = ns.hackAnalyzeSecurity(hackThreads);
+            const growSecInc = ns.growthAnalyzeSecurity(growThreads);
+            const weakAnalysis = ns.weakenAnalyze(1);
+            const weakThreads1 = Math.ceil(hackSecInc / weakAnalysis);
+            const weakThreads2 = Math.ceil(growSecInc / weakAnalysis);
 
             const ramCost = hackThreads * hackCost + growThreads * growCost + (weakThreads1 + weakThreads2) * weakCost;
 
@@ -108,7 +112,7 @@ async function hackServer(ns: NS, target: string) {
                     const hackTime: number = ns.getHackTime(target);
 
                     const nextLanding = weakTime + performance.now() + padding;
-                    ns.print(`sending out a batch with ${hackThreads} hack threads, ${growThreads} grow threads, ${weakThreads1 + weakThreads2} weak threads, with a landing time of: ${nextLanding}`);
+                    ns.print(`New batch from ${server} with landing time: ${nextLanding}, hack threads: ${hackThreads}, weak threads 1: ${weakThreads1}, grow threads: ${growThreads}, weak threads 2: ${weakThreads2}`);
                     ns.exec("hk.ts", server, hackThreads, target, nextLanding + 50, hackTime);
                     ns.exec("wk.ts", server, weakThreads1, target, nextLanding + 100, weakTime);
                     ns.exec("gr.ts", server, growThreads, target, nextLanding + 150, growTime);
