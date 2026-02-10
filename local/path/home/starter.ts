@@ -10,7 +10,7 @@ export async function main(ns: NS) {
     let target = "";
     if (ns.args.length > 0) {
         target = ns.args[0] as string;
-    }else{
+    } else {
         target = utils.findTarget(ns);
     }
     ns.clearPort(1);
@@ -37,12 +37,13 @@ async function prepServer(ns: NS, target: string) {
 
     const ramCost = growCost + weakCost + weakCost;
 
-    const potentialServers = utils.netscan(ns);
-    await ns.sleep(50);
-    const servers = potentialServers.filter(s => ns.hasRootAccess(s) && ns.getServerMaxRam(s) - ns.getServerUsedRam(s) >= ramCost);
+    let potentialServers  = utils.netscan(ns);
+    let servers = potentialServers.filter(s => ns.hasRootAccess(s) && ns.getServerMaxRam(s) - ns.getServerUsedRam(s) >= ramCost);
 
     ns.print("Starting prep for " + target);
     while (!isTargetPrepped(ns, target)) {
+        potentialServers = utils.netscan(ns);
+        servers = potentialServers.filter(s => ns.hasRootAccess(s) && ns.getServerMaxRam(s) - ns.getServerUsedRam(s) >= ramCost);
         // running weak grow weak.
         const growTime: number = ns.getGrowTime(target);
         const weakTime: number = ns.getWeakenTime(target);
@@ -81,16 +82,11 @@ async function hackServer(ns: NS, target: string) {
     const weakCost = ns.getScriptRam("wk.ts");
     const growCost = ns.getScriptRam("gr.ts");
 
-    const potentialServers = utils.netscan(ns);
-    await ns.sleep(50);
-    const servers = potentialServers.filter(s => ns.hasRootAccess(s))
-
     const greed = 0.0001; // percent of money to steal 
     const steal = ns.getServerMaxMoney(target) * greed;
 
     while (true) {
         const potentialServers = utils.netscan(ns);
-        await ns.sleep(50);
         const servers = potentialServers.filter(s => ns.hasRootAccess(s))
 
         const hackThreads = Math.max(Math.floor(ns.hackAnalyzeThreads(target, steal)), 1);
