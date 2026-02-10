@@ -64,6 +64,8 @@ async function prepServer(ns: NS, target: string) {
     ns.print("Finished prep for " + target);
 
     // kill all remaining prep batches
+    potentialServers = utils.netscan(ns);
+    servers = potentialServers.filter(s => ns.hasRootAccess(s) && ns.getServerMaxRam(s) - ns.getServerUsedRam(s) >= ramCost);
 
     for (let server of servers) {
         const pids = ns.ps(server);
@@ -73,6 +75,7 @@ async function prepServer(ns: NS, target: string) {
             }
         }
     }
+    await ns.sleep(10000);
 }
 
 async function hackServer(ns: NS, target: string) {
@@ -82,7 +85,7 @@ async function hackServer(ns: NS, target: string) {
     const weakCost = ns.getScriptRam("wk.ts");
     const growCost = ns.getScriptRam("gr.ts");
 
-    const greed = 0.0001; // percent of money to steal 
+    const greed = 0.1; // percent of money to steal 
     const steal = ns.getServerMaxMoney(target) * greed;
 
     while (true) {
