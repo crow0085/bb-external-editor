@@ -10,7 +10,7 @@ export async function main(ns: NS) {
             let hname = ns.cloud.purchaseServer("pserv-" + numServers, ram);
             ns.scp(["hk.ts", "wk.ts", "gr.ts", "starter.ts", "utils/utils.ts", "utils/monitor.ts"], hname);
             numServers++;
-            ns.tprint(`Purchased server ${hname} with ${ram}GB of RAM. Total servers: ${numServers}`);
+            ns.tprint(`Purchased server ${hname} with ${ns.format.ram(ram)} of RAM. Total servers: ${numServers}`);
         }
 
         await ns.sleep(1000);
@@ -25,7 +25,7 @@ export async function main(ns: NS) {
                 const nextRam = Math.min(nextPowerOfTwo(curRam+1), ns.cloud.getRamLimit());
                 if (ns.getServerMoneyAvailable("home") > ns.cloud.getServerUpgradeCost(server, nextRam)) {
                     ns.cloud.upgradeServer(server, nextRam);
-                    ns.tprint(`Upgraded server ${server} to ${nextRam}GB of RAM.`);
+                    ns.tprint(`Upgraded server ${server} to ${ns.format.ram(nextRam)} of RAM.`);
                 }
             }
         }
