@@ -91,7 +91,7 @@ async function hackServer(ns: NS, target: string) {
 
             const hackThreads = Math.max(Math.floor(ns.hackAnalyzeThreads(target, steal)), 1);
             const hackPercent = ns.hackAnalyze(target) * hackThreads; // the actual percent of money we will steal based on the number of hack threads
-            const growThreads = Math.max(Math.ceil(ns.growthAnalyze(target, ns.getServerMaxMoney(target) / (ns.getServerMaxMoney(target) - ns.getServerMaxMoney(target) * hackPercent))), 1);
+            const growThreads = Math.ceil(Math.max(Math.ceil(ns.growthAnalyze(target, ns.getServerMaxMoney(target) / (ns.getServerMaxMoney(target) - ns.getServerMaxMoney(target) * hackPercent))), 1)*1.1);
             const weakThreads1 = Math.max(Math.ceil(ns.hackAnalyzeSecurity(hackThreads, target)), 1);
             const weakThreads2 = Math.max(Math.ceil(ns.growthAnalyzeSecurity(growThreads, target)), 1);
 
