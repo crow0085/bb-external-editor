@@ -19,7 +19,7 @@ export async function main(ns: NS) {
             server = "n00dles"
         }
 
-        ns.print(server)
+        ns.print(portData);
         
         ns.print(`Server: ${server}`);
         let isPrepped: Boolean = ns.getServerMoneyAvailable(server) == ns.getServerMaxMoney(server) && ns.getServerSecurityLevel(server) == ns.getServerMinSecurityLevel(server);

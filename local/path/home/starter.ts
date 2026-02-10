@@ -7,8 +7,14 @@ export async function main(ns: NS) {
     ns.ui.resizeTail(800, 600);
     ns.disableLog('ALL');
     ns.clearLog();
-
-    const target = "n00dles";
+    let target = "";
+    if (ns.args.length > 0) {
+        target = ns.args[0] as string;
+    }else{
+        target = utils.findTarget(ns);
+    }
+    ns.clearPort(1);
+    ns.writePort(1, target);
 
     await nukeAllServers(ns);
     if (!isTargetPrepped(ns, target)) {
@@ -55,6 +61,17 @@ async function prepServer(ns: NS, target: string) {
         await ns.sleep(50);
     }
     ns.print("Finished prep for " + target);
+
+    // kill all remaining prep batches
+
+    for (let server of servers) {
+        const pids = ns.ps(server);
+        for (let pid of pids) {
+            if (pid.filename == "wk.ts" || pid.filename == "gr.ts") {
+                ns.kill(pid.pid);
+            }
+        }
+    }
 }
 
 async function hackServer(ns: NS, target: string) {
@@ -72,6 +89,9 @@ async function hackServer(ns: NS, target: string) {
     const steal = ns.getServerMaxMoney(target) * greed;
 
     while (true) {
+        const potentialServers = utils.netscan(ns);
+        await ns.sleep(50);
+        const servers = potentialServers.filter(s => ns.hasRootAccess(s))
 
         const hackThreads = Math.max(Math.floor(ns.hackAnalyzeThreads(target, steal)), 1);
         const hackPercent = ns.hackAnalyze(target) * hackThreads; // the actual percent of money we will steal

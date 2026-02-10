@@ -35,3 +35,32 @@ export function nukeServer(ns: NS, server: string) {
     ns.nuke(server);
     ns.tprint(`nuking server: ${server}`)
 }
+
+export function findTarget(ns: NS) {
+    let servers = netscan(ns);
+    let customServers: CustomServer[] = [];
+    servers.forEach(server => {
+        customServers.push(new CustomServer(server, ns));
+    });
+    customServers.sort((a, b) => b.getWeight() - a.getWeight());
+    return customServers[0].hostname;
+}
+
+
+class CustomServer{
+    hostname: string;
+    ns: NS;
+
+    constructor(hostname: string, ns:NS) {
+        this.hostname = hostname;
+        this.ns = ns;
+    }
+
+    getWeight(){
+        const weight = this.ns.getServerMaxMoney(this.hostname) / this.ns.getServerMinSecurityLevel(this.hostname);
+        if (this.ns.getServerRequiredHackingLevel(this.hostname) > Math.ceil(this.ns.getHackingLevel()/2)) {
+            return 0;
+        }
+        return weight;
+    }
+}
