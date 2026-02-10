@@ -34,7 +34,7 @@ async function prepServer(ns: NS, target: string) {
     const padding = 2000;
     const weakCost = ns.getScriptRam("wk.ts");
     const growCost = ns.getScriptRam("gr.ts");
-    const ramCost = growCost + weakCost + weakCost;    
+    const ramCost = growCost + weakCost + weakCost;
 
     ns.print("Starting prep for " + target);
     while (!isTargetPrepped(ns, target)) {
@@ -83,43 +83,38 @@ async function hackServer(ns: NS, target: string) {
     const steal = ns.getServerMaxMoney(target) * greed;
 
     while (true) {
-        if (!isTargetPrepped(ns, target)) {
-            ns.print("Server is not prepped, prepping now...");
-            await prepServer(ns, target);
-        } else {
-            const servers = utils.netscan(ns).filter(s => ns.hasRootAccess(s));
+        const servers = utils.netscan(ns).filter(s => ns.hasRootAccess(s));
 
-            const hackThreads = Math.max(Math.floor(ns.hackAnalyzeThreads(target, steal)), 1);
-            const hackPercent = ns.hackAnalyze(target) * hackThreads; // the actual percent of money we will steal based on the number of hack threads
-            const growThreads = Math.ceil(ns.growthAnalyze(target, ns.getServerMaxMoney(target) / (ns.getServerMaxMoney(target) - ns.getServerMaxMoney(target) * hackPercent))*1.1);
-            
-            const hackSecInc = ns.hackAnalyzeSecurity(hackThreads);
-            const growSecInc = ns.growthAnalyzeSecurity(growThreads);
-            const weakAnalysis = ns.weakenAnalyze(1);
-            const weakThreads1 = Math.ceil(hackSecInc / weakAnalysis);
-            const weakThreads2 = Math.ceil(growSecInc / weakAnalysis);
+        const hackThreads = Math.max(Math.floor(ns.hackAnalyzeThreads(target, steal)), 1);
+        const hackPercent = ns.hackAnalyze(target) * hackThreads; // the actual percent of money we will steal based on the number of hack threads
+        const growThreads = Math.ceil(ns.growthAnalyze(target, ns.getServerMaxMoney(target) / (ns.getServerMaxMoney(target) - ns.getServerMaxMoney(target) * hackPercent)) * 1.1);
 
-            const ramCost = hackThreads * hackCost + growThreads * growCost + (weakThreads1 + weakThreads2) * weakCost;
+        const hackSecInc = ns.hackAnalyzeSecurity(hackThreads);
+        const growSecInc = ns.growthAnalyzeSecurity(growThreads);
+        const weakAnalysis = ns.weakenAnalyze(1);
+        const weakThreads1 = Math.ceil(hackSecInc / weakAnalysis);
+        const weakThreads2 = Math.ceil(growSecInc / weakAnalysis);
 
-            for (let server of servers) {
-                ns.scp(["hk.ts", "wk.ts", "gr.ts"], server);
-                await ns.sleep(50);
-                let freeRam = ns.getServerMaxRam(server) - ns.getServerUsedRam(server);
-                while (ramCost < freeRam) {
-                    //send out a batch
-                    const growTime: number = ns.getGrowTime(target);
-                    const weakTime: number = ns.getWeakenTime(target);
-                    const hackTime: number = ns.getHackTime(target);
+        const ramCost = hackThreads * hackCost + growThreads * growCost + (weakThreads1 + weakThreads2) * weakCost;
 
-                    const nextLanding = weakTime + performance.now() + padding;
-                    ns.print(`New batch from ${server} with landing time: ${nextLanding}, hack threads: ${hackThreads}, weak threads 1: ${weakThreads1}, grow threads: ${growThreads}, weak threads 2: ${weakThreads2}`);
-                    ns.exec("hk.ts", server, hackThreads, target, nextLanding + 50, hackTime);
-                    ns.exec("wk.ts", server, weakThreads1, target, nextLanding + 100, weakTime);
-                    ns.exec("gr.ts", server, growThreads, target, nextLanding + 150, growTime);
-                    ns.exec("wk.ts", server, weakThreads2, target, nextLanding + 200, weakTime);
-                    freeRam = ns.getServerMaxRam(server) - ns.getServerUsedRam(server);
-                    await ns.sleep(250);
-                }
+        for (let server of servers) {
+            ns.scp(["hk.ts", "wk.ts", "gr.ts"], server);
+            await ns.sleep(50);
+            let freeRam = ns.getServerMaxRam(server) - ns.getServerUsedRam(server);
+            while (ramCost < freeRam) {
+                //send out a batch
+                const growTime: number = ns.getGrowTime(target);
+                const weakTime: number = ns.getWeakenTime(target);
+                const hackTime: number = ns.getHackTime(target);
+
+                const nextLanding = weakTime + performance.now() + padding;
+                ns.print(`New batch from ${server} with landing time: ${nextLanding}, hack threads: ${hackThreads}, weak threads 1: ${weakThreads1}, grow threads: ${growThreads}, weak threads 2: ${weakThreads2}`);
+                ns.exec("hk.ts", server, hackThreads, target, nextLanding + 50, hackTime);
+                ns.exec("wk.ts", server, weakThreads1, target, nextLanding + 100, weakTime);
+                ns.exec("gr.ts", server, growThreads, target, nextLanding + 150, growTime);
+                ns.exec("wk.ts", server, weakThreads2, target, nextLanding + 200, weakTime);
+                freeRam = ns.getServerMaxRam(server) - ns.getServerUsedRam(server);
+                await ns.sleep(250);
             }
         }
 
