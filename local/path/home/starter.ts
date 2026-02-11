@@ -102,7 +102,7 @@ function getThreads(ns: NS, target: string, greed: number): number[] {
 async function hackServer(ns: NS, target: string) {
     const greed = 0.1; // percent of money to steal | 0.1 = 10%
 
-    const padding = 500;
+    const padding = 1000;
     const hackCost = ns.getScriptRam("hk.ts");
     const weakCost = ns.getScriptRam("wk.ts");
     const growCost = ns.getScriptRam("gr.ts");
@@ -127,11 +127,11 @@ async function hackServer(ns: NS, target: string) {
                 ns.exec("gr.ts", server, growThreads, target, nextLanding + 150, growTime);
                 ns.exec("wk.ts", server, weakThreads2, target, nextLanding + 200, weakTime);
                 freeRam = ns.getServerMaxRam(server) - ns.getServerUsedRam(server);
-                await ns.sleep(0);
+                await ns.sleep(50);
             }
         }
 
-        await ns.sleep(0);
+        await ns.sleep(50);
     }
 
 }
