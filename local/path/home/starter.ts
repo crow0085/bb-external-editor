@@ -127,11 +127,11 @@ async function hackServer(ns: NS, target: string) {
                 ns.exec("gr.ts", server, growThreads, target, nextLanding + 150, growTime);
                 ns.exec("wk.ts", server, weakThreads2, target, nextLanding + 200, weakTime);
                 freeRam = ns.getServerMaxRam(server) - ns.getServerUsedRam(server);
-                await ns.sleep(50);
+                await ns.sleep(0);
             }
         }
 
-        await ns.sleep(50);
+        await ns.sleep(0);
     }
 
 }

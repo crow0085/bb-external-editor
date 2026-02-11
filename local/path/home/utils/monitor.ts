@@ -1,5 +1,5 @@
 export async function main(ns: NS) {
-    const delay = 50;
+    const delay = 0;
 
     ns.ui.openTail();
     ns.ui.resizeTail(422, 281);
