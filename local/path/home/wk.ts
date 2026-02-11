@@ -4,5 +4,6 @@ export async function main(ns: NS) {
     let runtime:number = ns.args[2] as number;
     let currentTime = performance.now();
     let msecDelay: number = batchLand - currentTime - runtime
+    //ns.tprint(`Weaken batch for ${target} with landing time: ${batchLand}, current time: ${currentTime}, runtime: ${runtime}, msec delay: ${ns.format.time(msecDelay)}`);
     await ns.weaken(target, { additionalMsec: msecDelay })
 }
