@@ -57,8 +57,10 @@ class CustomServer{
     }
 
     getWeight(){
+        if (this.hostname == "home")
+            return 0;
         const weight = this.ns.getServerMaxMoney(this.hostname) / this.ns.getServerMinSecurityLevel(this.hostname);
-        if (this.ns.getServerRequiredHackingLevel(this.hostname) > Math.ceil(this.ns.getHackingLevel()/2) || !this.ns.hasRootAccess(this.hostname) || this.hostname == "home") {
+        if (this.ns.getServerRequiredHackingLevel(this.hostname) > Math.ceil(this.ns.getHackingLevel()/2) || !this.ns.hasRootAccess(this.hostname)) {
             return 0;
         }
         return weight;

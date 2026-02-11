@@ -7,19 +7,22 @@ export async function main(ns: NS) {
     ns.ui.resizeTail(1400, 600);
     ns.disableLog('ALL');
     ns.clearLog();
+    await nukeAllServers(ns);
+
     let target = "";
     if (ns.args.length > 0) {
         target = ns.args[0] as string;
     } else {
         target = utils.findTarget(ns);
     }
-    ns.clearPort(1);
-    ns.writePort(1, target);
 
-    await nukeAllServers(ns);
+    ns.clearPort(1);
+    ns.writePort(1, target);  
+
     if (!isTargetPrepped(ns, target)) {
         await prepServer(ns, target);
     }
+    
     await hackServer(ns, target);
 
 }
@@ -63,7 +66,7 @@ async function prepServer(ns: NS, target: string) {
         const servers = utils.netscan(ns).filter(s => ns.hasRootAccess(s));
         for (let server of servers) {
             let freeRam = ns.getServerMaxRam(server) - ns.getServerUsedRam(server);
-            while(ramCost < freeRam){
+            while(ramCost < freeRam && !isTargetPrepped(ns, target)){
                 const growTime: number = ns.getGrowTime(target);
                 const weakTime: number = ns.getWeakenTime(target);
                 const nextLanding = weakTime + performance.now() + 500;
