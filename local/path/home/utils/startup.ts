@@ -12,4 +12,15 @@ export async function main(ns: NS) {
         ns.tprint(`copied scripts: ["hk.ts", "wk.ts", "gr.ts", "starter.ts", "utils/utils.ts", "utils/monitor.ts"] to ${s}`);
     }
 
+
+    ns.exec("utils/monitor.ts", "home", 1);
+
+    ns.exec("utils/buysell.ts", "home", 1);
+
+    const shareRam = 0.8;
+    const threads = Math.floor((ns.getServerMaxRam("home") * shareRam) / ns.getScriptRam("utils/shareRam.ts"));
+    ns.exec("utils/shareRam.ts", "home", threads);
+
+    ns.exec("starter.ts", "home", 1);
+
 }   
