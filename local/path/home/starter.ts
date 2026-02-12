@@ -115,8 +115,6 @@ async function hackServer(ns: NS, target: string) {
     const weakCost = ns.getScriptRam("wk.ts");
     const growCost = ns.getScriptRam("gr.ts");
 
-    let nextLanding = 0;
-
     while (true) {
         const [hackThreads, growThreads, weakThreads1, weakThreads2] = getThreads(ns, target, greed);
         const ramCost = hackThreads * hackCost + growThreads * growCost + (weakThreads1 + weakThreads2) * weakCost;
@@ -125,16 +123,7 @@ async function hackServer(ns: NS, target: string) {
         const hackTime = ns.getHackTime(target);
         const growTime = ns.getGrowTime(target);
 
-        const potentialLanding = performance.now() + weakTime + padding;
-        if (nextLanding < potentialLanding) {
-            nextLanding = potentialLanding;
-        }
-
-        // so our landing time doesnt get way too large
-        if (nextLanding > potentialLanding + 5000){
-            await ns.sleep(100);
-            continue;
-        }
+        const nextLanding = performance.now() + weakTime + padding;
 
         let servers = utils.netscan(ns).filter(s => ns.hasRootAccess(s));
         for (let server of servers) {
@@ -143,10 +132,9 @@ async function hackServer(ns: NS, target: string) {
             if (freeRam > ramCost) {
                 ns.print(`Launching batch from ${server} with landing time: ${nextLanding}, hack threads: ${hackThreads}, grow threads: ${growThreads}, weak threads 1: ${weakThreads1}, weak threads 2: ${weakThreads2}`);
                 ns.exec("hk.ts", server, hackThreads, target, nextLanding, hackTime);
-                ns.exec("wk.ts", server, weakThreads1, target, nextLanding + spacer, weakTime);
-                ns.exec("gr.ts", server, growThreads, target, nextLanding + spacer * 2, growTime);
-                ns.exec("wk.ts", server, weakThreads2, target, nextLanding + spacer * 3, weakTime);
-                nextLanding += spacer * 4;
+                ns.exec("wk.ts", server, weakThreads1, target, nextLanding, weakTime);
+                ns.exec("gr.ts", server, growThreads, target, nextLanding, growTime);
+                ns.exec("wk.ts", server, weakThreads2, target, nextLanding, weakTime);
                 break;
             }
         }
