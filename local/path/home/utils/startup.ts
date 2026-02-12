@@ -15,7 +15,7 @@ export async function main(ns: NS) {
 
     ns.exec("utils/monitor.ts", "home", 1);
 
-    ns.exec("utils/buysell.ts", "home", 1);
+    ns.exec("utils/buyServers.ts", "home", 1);
 
     const shareRam = 0.8;
     const threads = Math.floor((ns.getServerMaxRam("home") * shareRam) / ns.getScriptRam("utils/shareRam.ts"));

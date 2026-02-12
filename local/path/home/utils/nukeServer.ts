@@ -10,3 +10,7 @@ export async function main(ns: NS) {
     
     utils.nukeServer(ns, target);
 }
+
+export function autocomplete(data, args) {
+    return data.servers;
+}
