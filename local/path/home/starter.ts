@@ -39,21 +39,6 @@ async function prepServer(ns: NS, target: string) {
     if (isTargetPrepped(ns, target))
         return;
 
-    // const missingMoney = 1- (ns.getServerMoneyAvailable(target) / ns.getServerMaxMoney(target)); // percent of money missing on the target
-    // const maxGrowThreads = Math.ceil(ns.growthAnalyze(target, 1 / (1 - missingMoney))); // total amount of grow threads needed to bring server to max money
-    // const growSecInc = ns.growthAnalyzeSecurity(maxGrowThreads);
-    // const weakAnalysis = ns.weakenAnalyze(1);
-    // const maxWeakThreads1 = Math.ceil(growSecInc / weakAnalysis); // max amount of weaken threads to counter the grow threads security increase
-    // const minSecLevel = ns.getServerMinSecurityLevel(target);
-    // const curSecLevel = ns.getServerSecurityLevel(target);
-    // const maxWeakThreads2 = Math.ceil((curSecLevel - minSecLevel) / weakAnalysis); // max amount of weaken threads to counter the current security level above minimum
-
-    // const totalRam = maxGrowThreads * ns.getScriptRam("gr.ts") + (maxWeakThreads1 + maxWeakThreads2) * ns.getScriptRam("wk.ts");
-
-    // ns.print(`Missing money: ${ns.format.percent(missingMoney)}, max grow threads: ${maxGrowThreads}, grow security increase: ${growSecInc}, max weaken threads to counter grow: ${maxWeakThreads1}, current sec level: ${curSecLevel}, min sec level: ${minSecLevel}, max weaken threads to counter current sec level: ${maxWeakThreads2}`);
-    // ns.print(`Total RAM needed for prep: ${ns.format.ram(totalRam)}`);
-    // ns.exit();
-
     const growBy = 0.001; // how much to grow by with each batch | 0.01 = 1%
     while (!isTargetPrepped(ns, target)) {
         const threads = getThreads(ns, target, growBy);
