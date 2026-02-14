@@ -16,6 +16,9 @@ export async function main(ns: NS) {
         target = utils.findTarget(ns);
     }
 
+    if (ns.getHackingLevel() < 100)
+        target = "n00dles";
+
     ns.clearPort(1);
     ns.writePort(1, target);
 
@@ -39,7 +42,7 @@ async function prepServer(ns: NS, target: string) {
     if (isTargetPrepped(ns, target))
         return;
 
-    const growBy = 0.001; // how much to grow by with each batch | 0.01 = 1%
+    const growBy = 0.0001; // how much to grow by with each batch | 0.01 = 1%
     while (!isTargetPrepped(ns, target)) {
         const threads = getThreads(ns, target, growBy);
         const growThreads = threads[1];
@@ -60,10 +63,10 @@ async function prepServer(ns: NS, target: string) {
                 ns.exec("wk.ts", server, weakThreads1, target, nextLanding + 100, weakTime);
                 ns.exec("wk.ts", server, weakThreads2, target, nextLanding + 150, weakTime);
                 freeRam = ns.getServerMaxRam(server) - ns.getServerUsedRam(server);
-                await ns.sleep(50);
+                await ns.sleep(0);
             }
         }
-        await ns.sleep(50);
+        await ns.sleep(0);
     }
     const servers = utils.netscan(ns).filter(s => ns.hasRootAccess(s));
     //kill pids with hk wk gr
@@ -91,7 +94,9 @@ function getThreads(ns: NS, target: string, greed: number): number[] {
 }
 
 async function hackServer(ns: NS, target: string) {
-    const greed = 0.1; // percent of money to steal | 0.1 = 10%
+    let greed = 0.01; // percent of money to steal | 0.1 = 10%
+    if (ns.getServerMaxRam("home")< 128)
+        greed = 0.005;
 
     const padding = 1000;
     const spacer = 50;
@@ -124,7 +129,7 @@ async function hackServer(ns: NS, target: string) {
             }
         }
 
-        await ns.sleep(5)
+        await ns.sleep(0)
     }
 
 }
